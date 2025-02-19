@@ -61,7 +61,7 @@ export default function Home({ providerId, modelId }: { providerId: string; mode
         </div>
       </div>
 
-      <div className="flex-none border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4">
+      <div className="flex-none  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-0">
         <div className="max-w-3xl mx-auto">
           <form onSubmit={async (e) => {
             e.preventDefault();
