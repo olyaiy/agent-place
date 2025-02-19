@@ -1,0 +1,1 @@
+ALTER TABLE "agents" ALTER COLUMN "agent_id" SET DEFAULT 'temp_slug';

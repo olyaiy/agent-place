@@ -5,3 +5,5 @@ export const providers = pgTable("providers", {
   providerId: varchar("provider_id", { length: 255 }).notNull(),
   providerName: varchar("provider_name", { length: 255 }).notNull(),
 });
+
+export type Provider = typeof providers.$inferSelect;

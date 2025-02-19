@@ -1,4 +1,3 @@
-
 import { pgTable, uuid, varchar } from "drizzle-orm/pg-core";
 import { providers } from "./providers"; // Importing related schema
 
@@ -8,3 +7,5 @@ export const models = pgTable("models", {
   modelId: varchar("model_id", { length: 255 }).notNull(),
   providerId: uuid("provider_id").references(() => providers.id, { onDelete: "cascade" }),
 });
+
+export type Model = typeof models.$inferSelect;
