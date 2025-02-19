@@ -5,6 +5,7 @@ import { openai } from '@ai-sdk/openai';
 import { createStreamableValue } from 'ai/rsc';
 
 export interface Message {
+  id: string;
   role: 'user' | 'assistant';
   content: string;
 }

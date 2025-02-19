@@ -38,21 +38,18 @@ export default async function ChatPage({ params }: { params: { chat: string } })
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{data.name}</h1>
-      <div className="space-y-4">
-        <div>
-          <h2 className="font-semibold">System Prompt</h2>
-          <p className="text-gray-600 whitespace-pre-wrap">{data.systemPrompt}</p>
+    <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
+      <div className="flex-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 max-w-screen-2xl items-center">
+          <h1 className="text-lg font-semibold ml-14">{data.name}</h1>
         </div>
-        {/* <MessageInput value={''} isGenerating={false}/> */}
-        <ChatInterface providerId={data.providerId ?? 'openai'} modelId={data.modelId ?? 'gpt-4o-mini'} />
-        <div>
-          <h2 className="font-semibold">Agent ID</h2>
-          <p className="text-gray-600">{data.agentId}</p>
-          <p className="text-gray-600">{data.modelId}</p>
-          <p className="text-gray-600">{data.providerId}</p>
-        </div>
+      </div>
+      
+      <div className="flex-1 overflow-hidden">
+        <ChatInterface 
+          providerId={data.providerId ?? 'openai'} 
+          modelId={data.modelId ?? 'gpt-4-mini'} 
+        />
       </div>
     </div>
   );
