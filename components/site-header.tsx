@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/sign-out-button";
 import { Session } from "better-auth";
-
+import { usePathname } from "next/navigation";
 
 export function SiteHeader({ session }: { session: (Session & { user?: { name: string } }) | null }) {
+  const pathname = usePathname();
+
   return (
     <header className="sticky top-0 left-0 right-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
       <div className="container flex h-14 items-center justify-between  mx-auto">
@@ -22,10 +24,16 @@ export function SiteHeader({ session }: { session: (Session & { user?: { name: s
             </div>
           ) : (
             <div className="flex gap-4">
-              <Link href="/auth" className="text-sm font-medium hover:underline">
+              <Link 
+                href={`/signin?callbackUrl=${encodeURIComponent(pathname)}`} 
+                className="text-sm font-medium hover:underline"
+              >
                 Sign in
               </Link>
-              <Link href="/auth" className="text-sm font-medium hover:underline">
+              <Link 
+                href={`/signup?callbackUrl=${encodeURIComponent(pathname)}`} 
+                className="text-sm font-medium hover:underline"
+              >
                 Sign up
               </Link>
             </div>

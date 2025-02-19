@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
 import { useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 
 interface SignUpFormData {
   email: string
@@ -14,10 +16,21 @@ interface SignUpFormData {
   name: string
 }
 
-export function SignUpForm() {
+interface SignUpFormProps {
+  callbackUrl?: string;
+}
+
+export function SignUpForm({ callbackUrl }: SignUpFormProps) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
-  const form = useForm<SignUpFormData>()
+  const form = useForm<SignUpFormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: ''
+    }
+  })
+  const [showPassword, setShowPassword] = useState(false)
 
   const onSubmit = (data: SignUpFormData) => {
     startTransition(async () => {
@@ -29,6 +42,7 @@ export function SignUpForm() {
 
       if (!error) {
         router.refresh()
+        router.push(callbackUrl || "/")
       }
     })
   }
@@ -69,7 +83,26 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} required />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    {...field}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
