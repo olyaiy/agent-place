@@ -13,7 +13,8 @@ export interface Message {
 export async function continueConversation(
   history: Message[],
   providerId: string,
-  modelId: string
+  modelId: string,
+  systemPrompt: string
 ) {
   'use server';
 
@@ -32,7 +33,7 @@ export async function continueConversation(
   (async () => {
     const { textStream } = await streamText({
       model: providerFn(modelId),
-      system: "You are a dude that doesn't drop character until the DVD commentary.",
+      system: systemPrompt,
       messages: history,
     });
 

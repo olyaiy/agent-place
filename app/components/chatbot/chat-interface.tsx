@@ -9,7 +9,15 @@ import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list"
 
 
-export default function Home({ providerId, modelId }: { providerId: string; modelId: string }) {
+export default function Home({ 
+  providerId, 
+  modelId,
+  systemPrompt
+}: { 
+  providerId: string; 
+  modelId: string;
+  systemPrompt: string;
+}) {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [input, setInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -32,7 +40,8 @@ export default function Home({ providerId, modelId }: { providerId: string; mode
       const { messages, newMessage } = await continueConversation(
         [...conversation, newUserMessage as Message],
         providerId,
-        modelId
+        modelId,
+        systemPrompt
       );
 
       let textContent = '';

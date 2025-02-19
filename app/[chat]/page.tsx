@@ -3,8 +3,9 @@ import { agents } from '../../db/schema/agents';
 import { eq } from 'drizzle-orm';
 import { openai } from '@ai-sdk/openai';
 import ChatInterface from '../components/chatbot/chat-interface';
-
-
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { SettingsIcon } from "lucide-react";
 
 const providers = {
   openai,
@@ -42,13 +43,27 @@ export default async function ChatPage({ params }: { params: { chat: string } })
       <div className="flex-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-screen-2xl items-center">
           <h1 className="text-lg font-semibold ml-14">{data.name}</h1>
+          <div className="ml-auto">
+            <Link href={`/agents/${data.agentId}`}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-muted"
+                title="Agent settings"
+              >
+                <SettingsIcon className="h-5 w-5" />
+                <span className="sr-only">Agent Settings</span>
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
       
       <div className="flex-1 overflow-hidden">
         <ChatInterface 
           providerId={data.providerId ?? 'openai'} 
-          modelId={data.modelId ?? 'gpt-4-mini'} 
+          modelId={data.modelId ?? 'gpt-4-mini'}
+          systemPrompt={data.systemPrompt}
         />
       </div>
     </div>

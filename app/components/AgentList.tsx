@@ -22,7 +22,7 @@ export function AgentList({ items }: { items: Agent[] }) {
           <Link href={`/${agent.agentId}`} className="block mb-2">
             <h3 className="font-medium">{agent.name}</h3>
             <p className="text-sm text-gray-500 line-clamp-2">
-              {agent.systemPrompt}
+              {agent.description || "No description"}
             </p>
           </Link>
           
