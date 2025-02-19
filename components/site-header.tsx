@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { SignOutButton } from "@/components/sign-out-button";
-import { Session } from "better-auth";
 import { usePathname } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 
-export function SiteHeader({ session }: { session: (Session & { user?: { name: string } }) | null }) {
+export function SiteHeader() {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
 
   return (
     <header className="sticky top-0 left-0 right-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
@@ -19,7 +20,7 @@ export function SiteHeader({ session }: { session: (Session & { user?: { name: s
         <nav className="flex items-center gap-4">
           {session ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm">Welcome, {session?.user?.name ?? 'User'}</span>
+              <span className="text-sm">Welcome, {session.user?.name ?? 'User'}</span>
               <SignOutButton />
             </div>
           ) : (

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 
+
 interface SignInFormData {
   email: string
   password: string
@@ -36,6 +37,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
         email: data.email,
         password: data.password
       })
+
 
       if (!error) {
         router.refresh()

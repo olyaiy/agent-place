@@ -6,7 +6,7 @@ export async function signUp(email: string, password: string, name: string, imag
         password: password,
         name: name,
         image: image,
-        callbackURL: "/dashboard" // a url to redirect to after the user verifies their email (optional)
+        callbackURL: "/" // a url to redirect to after the user verifies their email (optional)
     }, {
         onRequest: (ctx) => {
             //show loading

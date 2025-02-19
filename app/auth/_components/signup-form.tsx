@@ -40,6 +40,8 @@ export function SignUpForm({ callbackUrl }: SignUpFormProps) {
         name: data.name
       })
 
+      
+
       if (!error) {
         router.refresh()
         router.push(callbackUrl || "/")
