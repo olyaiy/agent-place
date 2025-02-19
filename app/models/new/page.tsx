@@ -10,9 +10,9 @@ export default async function NewModelPage() {
     "use server";
     
     await db.insert(models).values({
-      modelName: formData.get("modelName") as string,
-      modelId: formData.get("modelId") as string,
-      providerId: formData.get("providerId") as string || null,
+      model_display_name: formData.get("modelName") as string,
+      model: formData.get("modelId") as string,
+      provider: formData.get("providerId") as string || null,
     });
 
     redirect("/models");
@@ -58,7 +58,7 @@ export default async function NewModelPage() {
             <option value="">Select a provider</option>
             {allProviders.map((provider) => (
               <option key={provider.id} value={provider.id}>
-                {provider.providerName}
+                {provider.provider_display_name}
               </option>
             ))}
           </select>

@@ -19,7 +19,7 @@ export default async function AgentEditPage({
   const [agent] = await db
     .select()
     .from(agents)
-    .where(eq(agents.agentId, resolvedParams.agent));
+    .where(eq(agents.agent, resolvedParams.agent));
 
   if (!agent) {
     redirect("/agents");
@@ -36,17 +36,16 @@ export default async function AgentEditPage({
     const name = formData.get("name") as string;
     
     // Only generate new agentId if name changed
-    const newAgentId = name === agent.name ? agent.agentId : slugify(name);
+    const newAgentId = name === agent.agent_display_name ? agent.agent : slugify(name);
 
     await db
       .update(agents)
       .set({
-        name: name,
-        description: formData.get("description") as string || null,
-        systemPrompt: formData.get("systemPrompt") as string,
-        modelId: formData.get("modelId") as string || null,
-        providerId: formData.get("providerId") as string || null,
-        agentId: newAgentId,
+        agent_display_name: name,
+        system_prompt: formData.get("systemPrompt") as string,
+        model: formData.get("modelId") as string || null,
+        provider: formData.get("providerId") as string || null,
+        agent: newAgentId,
       })
       .where(eq(agents.id, agent.id));
 
@@ -67,7 +66,7 @@ export default async function AgentEditPage({
             id="name"
             name="name"
             required
-            defaultValue={agent.name}
+            defaultValue={agent.agent_display_name}
             className="w-full p-2 border rounded-md"
           />
         </div>
@@ -95,7 +94,7 @@ export default async function AgentEditPage({
             name="systemPrompt"
             required
             rows={4}
-            defaultValue={agent.systemPrompt}
+            defaultValue={agent.system_prompt}
             className="w-full p-2 border rounded-md"
           />
         </div>
@@ -108,13 +107,13 @@ export default async function AgentEditPage({
             <select
               id="modelId"
               name="modelId"
-              defaultValue={agent.modelId || ""}
+              defaultValue={agent.model || ""}
               className="w-full p-2 border rounded-md"
             >
               <option value="">Select a model</option>
               {allModels.map((model) => (
-                <option key={model.id} value={model.modelId}>
-                  {model.modelName}
+                <option key={model.id} value={model.id}>
+                  {model.model_display_name}
                 </option>
               ))}
             </select>
@@ -127,13 +126,13 @@ export default async function AgentEditPage({
             <select
               id="providerId"
               name="providerId"
-              defaultValue={agent.providerId || ""}
+              defaultValue={agent.provider || ""}
               className="w-full p-2 border rounded-md"
             >
               <option value="">Select a provider</option>
               {allProviders.map((provider) => (
-                <option key={provider.id} value={provider.providerId}>
-                  {provider.providerName}
+                <option key={provider.id} value={provider.id}>
+                  {provider.provider_display_name}
                 </option>
               ))}
             </select>

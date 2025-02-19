@@ -5,6 +5,7 @@ import { providers } from "@/db/schema/providers";
 import { redirect } from "next/navigation";
 import { slugify } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
+import { eq } from "drizzle-orm";
 
 export default async function NewAgentPage() {
   // Fetch available models and providers for select options
@@ -15,17 +16,27 @@ export default async function NewAgentPage() {
     "use server";
     
     const name = formData.get("name") as string;
-    
-    await db.insert(agents).values({
-      name: name,
-      description: formData.get("description") as string || null,
-      systemPrompt: formData.get("systemPrompt") as string,
-      modelId: formData.get("modelId") as string || null,
-      providerId: formData.get("providerId") as string || null,
-      agentId: slugify(name) // Use slugified name instead of random UUID
+    const modelId = formData.get("modelId") as string;
+    const providerId = formData.get("providerId") as string;
+
+    // Get UUID references for model and provider
+    const model = await db.query.models.findFirst({
+      where: eq(models.model, modelId),
     });
 
-    redirect("/agents"); // Redirect to agent list after creation
+    const provider = await db.query.providers.findFirst({
+      where: eq(providers.provider, providerId),
+    });
+
+    await db.insert(agents).values({
+      agent_display_name: name,
+      system_prompt: formData.get("systemPrompt") as string,
+      model: model?.id || null,
+      provider: provider?.id || null,
+      agent: slugify(name)
+    });
+
+    redirect("/agents");
   }
 
   return (
@@ -82,8 +93,8 @@ export default async function NewAgentPage() {
             >
               <option value="">Select a model</option>
               {allModels.map((model) => (
-                <option key={model.id} value={model.modelId}>
-                  {model.modelName}
+                <option key={model.id} value={model.model}>
+                  {model.model_display_name}
                 </option>
               ))}
             </select>
@@ -100,8 +111,8 @@ export default async function NewAgentPage() {
             >
               <option value="">Select a provider</option>
               {allProviders.map((provider) => (
-                <option key={provider.id} value={provider.providerId}>
-                  {provider.providerName}
+                <option key={provider.id} value={provider.provider}>
+                  {provider.provider_display_name}
                 </option>
               ))}
             </select>

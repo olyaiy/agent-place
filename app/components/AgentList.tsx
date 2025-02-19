@@ -19,15 +19,15 @@ export function AgentList({ items }: { items: Agent[] }) {
           key={agent.id}
           className="w-64 p-4 border rounded-lg hover:bg-gray-50 transition-colors relative group"
         >
-          <Link href={`/${agent.agentId}`} className="block mb-2">
-            <h3 className="font-medium">{agent.name}</h3>
+          <Link href={`/${agent.agent}`} className="block mb-2">
+            <h3 className="font-medium">{agent.agent_display_name}</h3>
             <p className="text-sm text-gray-500 line-clamp-2">
               {agent.description || "No description"}
             </p>
           </Link>
           
           <Link
-            href={`/agents/${agent.agentId}`}
+            href={`/agents/${agent.agent}`}
             className="absolute top-2 right-2 p-1  transition-opacity"
             onClick={(e) => e.stopPropagation()}
           >

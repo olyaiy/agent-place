@@ -8,10 +8,8 @@ export const agents = pgTable("agents", {
   agent_display_name: varchar("agent_display_name", { length: 255 }).notNull(),
   system_prompt: text("system_prompt").notNull(),
   description: text("description"),
-  model: uuid("model")
-    .references(() => models.id, { onDelete: "set null" }),
-  provider: uuid("provider")
-    .references(() => providers.id, { onDelete: "set null" }),
+  model: uuid("model").references(() => models.id),
+  provider: uuid("provider").references(() => providers.id),
 });
 
 export type Agent = typeof agents.$inferSelect;

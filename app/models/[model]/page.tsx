@@ -15,7 +15,7 @@ export default async function ModelEditPage({
   const [model] = await db
     .select()
     .from(models)
-    .where(eq(models.modelId, resolvedParams.model));
+    .where(eq(models.model, resolvedParams.model));
 
   if (!model) {
     redirect("/models");
@@ -29,9 +29,9 @@ export default async function ModelEditPage({
     await db
       .update(models)
       .set({
-        modelName: formData.get("modelName") as string,
-        modelId: formData.get("modelId") as string,
-        providerId: formData.get("providerId") as string || null,
+        model_display_name: formData.get("modelName") as string,
+        model: formData.get("modelId") as string,
+        provider: formData.get("providerId") as string || null,
       })
       .where(eq(models.id, model.id));
 
@@ -52,7 +52,7 @@ export default async function ModelEditPage({
             id="modelName"
             name="modelName"
             required
-            defaultValue={model.modelName}
+            defaultValue={model.model_display_name}
             className="w-full p-2 border rounded-md"
           />
         </div>
@@ -65,7 +65,7 @@ export default async function ModelEditPage({
             id="modelId"
             name="modelId"
             required
-            defaultValue={model.modelId}
+            defaultValue={model.model}
             className="w-full p-2 border rounded-md"
           />
         </div>
@@ -77,13 +77,13 @@ export default async function ModelEditPage({
           <select
             id="providerId"
             name="providerId"
-            defaultValue={model.providerId || ""}
+            defaultValue={model.provider || ""}
             className="w-full p-2 border rounded-md"
           >
             <option value="">Select a provider</option>
             {allProviders.map((provider) => (
               <option key={provider.id} value={provider.id}>
-                {provider.providerName}
+                {provider.provider_display_name}
               </option>
             ))}
           </select>

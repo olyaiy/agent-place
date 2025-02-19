@@ -3,6 +3,7 @@
 import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { createStreamableValue } from 'ai/rsc';
+import { deepseek } from '@ai-sdk/deepseek';
 
 export interface Message {
   id: string;
@@ -20,6 +21,7 @@ export async function continueConversation(
 
   const providers = {
     openai,
+    deepseek,
     // Add other providers as needed
   };
 
