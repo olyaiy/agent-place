@@ -8,7 +8,7 @@ export async function signIn(email: string, password: string) {
     /**
      * a url to redirect to after the user verifies their email (optional)
      */
-    callbackURL: "/dashboard",
+    callbackURL: "/",
     /**
      * remember the user session after the browser is closed. 
      * @default true

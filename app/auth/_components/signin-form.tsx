@@ -7,9 +7,8 @@ import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
 import { useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Eye, EyeOff } from "lucide-react"
-
 
 interface SignInFormData {
   email: string
@@ -31,24 +30,60 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
   })
   const [showPassword, setShowPassword] = useState(false)
 
+  // Log initial props and form state
+  useEffect(() => {
+    console.log('SignInForm mounted with props:', { callbackUrl })
+    console.log('Initial form state:', form.getValues())
+  }, [callbackUrl, form])
+
+  // Watch form values changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      console.log('Form field changed:', { field: name, type, value })
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
+
   const onSubmit = (data: SignInFormData) => {
+    console.log('Form submission started:', data)
+    
     startTransition(async () => {
-      const { error } = await authClient.signIn.email({
-        email: data.email,
-        password: data.password
-      })
+      console.log('Starting authentication transition')
+      try {
+        const { error } = await authClient.signIn.email({
+          email: data.email,
+          password: data.password
+        })
 
+        console.log('Authentication response:', { error })
 
-      if (!error) {
-        router.refresh()
-        router.push(callbackUrl || "/")
+        if (!error) {
+          console.log('Authentication successful, navigating to:', callbackUrl || "/")
+          router.refresh()
+          router.push(callbackUrl || "/")
+        } else {
+          console.error('Authentication failed:', error)
+        }
+      } catch (error) {
+        console.error('Unexpected error during authentication:', error)
       }
     })
   }
 
+  // Log state changes
+  useEffect(() => {
+    console.log('Form pending state changed:', isPending)
+  }, [isPending])
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form 
+        onSubmit={form.handleSubmit((data) => {
+          console.log('Form submitted with data:', data)
+          onSubmit(data)
+        })} 
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="email"
@@ -56,7 +91,15 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" {...field} required />
+                <Input 
+                  type="email" 
+                  {...field} 
+                  required
+                  onChange={(e) => {
+                    console.log('Email input changed:', e.target.value)
+                    field.onChange(e)
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,13 +117,20 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
                     type={showPassword ? "text" : "password"}
                     {...field}
                     required
+                    onChange={(e) => {
+                      console.log('Password input changed:', { length: e.target.value.length })
+                      field.onChange(e)
+                    }}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => {
+                      console.log('Password visibility toggled:', !showPassword)
+                      setShowPassword(!showPassword)
+                    }}
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -105,4 +155,4 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
       </div>
     </Form>
   )
-} 
+}
