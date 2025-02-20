@@ -10,6 +10,7 @@ export function NewChatInterface({
   userId,
   agentId,
   chat
+  
 }: {
   agentName: string;
   userId: string;

@@ -101,16 +101,13 @@ export async function createConversation(
   agentId: string
 ) {
   'use server'
-
- 
-
   // Create conversation
   const [conversation] = await db.insert(conversations).values({
     userId,
     agentId: agentId,
   }).returning({ id: conversations.id })
 
-  // Create initial message
+  // Create initial user message
   await db.insert(messages).values({
     conversationId: conversation.id,
     role: 'user',

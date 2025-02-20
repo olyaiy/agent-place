@@ -10,7 +10,7 @@ export function SiteHeader() {
   const { data: session } = authClient.useSession();
 
   return (
-    <header className="sticky top-0 left-0 right-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
+    <header className="sticky top-0 left-0 right-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-red-500/10">
       <div className="container flex h-14 items-center justify-between  mx-auto">
         <Link href="/" className="font-bold text-lg flex items-center gap-2">
           <span className="text-primary">Agents</span>

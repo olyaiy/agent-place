@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useState, useEffect, useRef } from 'react';
 import { readStreamableValue } from 'ai/rsc';
 import { Message } from '@/app/[chat]/actions';
 import { continueConversation } from '@/app/[chat]/actions';
@@ -9,9 +8,7 @@ import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list"
 import { ChatContainer, ChatMessages } from '@/components/ui/chat';
 
-
-
-export default function Home({ 
+export default function ChatInterface({ 
   providerId, 
   modelId,
   systemPrompt,
@@ -27,24 +24,25 @@ export default function Home({
   const [conversation, setConversation] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+  // Prevent multiple auto calls on mount
+  const autoTriggered = useRef(false);
 
   const handleSend = async () => {
     setIsGenerating(true);
     try {
-      // Create new user message first
+      // Create new user message manually
       const newUserMessage = { 
         id: Date.now().toString(), 
         role: 'user', 
         content: input 
       };
-      
-      // Update conversation state immediately
-      setConversation(prev => [...prev, newUserMessage as Message]);
+
+      setConversation(prev => [...prev, newUserMessage]);
       setInput('');
 
       // Then process the AI response
       const { messages, newMessage } = await continueConversation(
-        [...conversation, newUserMessage as Message],
+        [...conversation, newUserMessage],
         providerId,
         modelId,
         systemPrompt,
@@ -52,10 +50,8 @@ export default function Home({
       );
 
       let textContent = '';
-      
-      // Existing streaming handling remains the same
       for await (const delta of readStreamableValue(newMessage)) {
-        textContent = `${textContent}${delta}`;
+        textContent += delta;
         setConversation([
           ...messages,
           { 
@@ -72,32 +68,57 @@ export default function Home({
     }
   };
 
+  // Auto-trigger assistant response if only the initial user message is present
+  useEffect(() => {
+    if (conversation.length === 1 && conversation[0].role === 'user' && !autoTriggered.current) {
+      autoTriggered.current = true; // ensure it's triggered only once
+      (async () => {
+        setIsGenerating(true);
+        try {
+          const { messages, newMessage } = await continueConversation(
+            conversation,
+            providerId,
+            modelId,
+            systemPrompt,
+            chatId
+          );
+          let textContent = '';
+          for await (const delta of readStreamableValue(newMessage)) {
+            textContent += delta;
+            setConversation([
+              ...messages,
+              { 
+                id: Date.now().toString(), 
+                role: 'assistant', 
+                content: textContent,
+                position: messages.length + 1,
+                createdAt: new Date()
+              },
+            ]);
+          }
+        } finally {
+          setIsGenerating(false);
+        }
+      })();
+    }
+  }, [conversation, providerId, modelId, systemPrompt, chatId]);
+
   return (
-    <ChatContainer>
-
-    <div className="flex flex-col h-full overflow-y-scroll">
-      <div className="flex-1 overflow-y-auto p-4">
+    <ChatContainer className="h-full">
+      <ChatMessages messages={conversation}>
         <div className="max-w-3xl mx-auto mt-auto">
-        <ChatMessages messages={conversation} > 
-          <MessageList
-            messages={conversation}
-            isTyping={isGenerating}
-          />
-        </ChatMessages>
-
+          <MessageList messages={conversation} isTyping={isGenerating} />
         </div>
-      </div>
-
-      <div className="flex-none  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-0">
-        <div className="max-w-3xl mx-auto bg-red-500 mt-atuo">
-
+      </ChatMessages>
+      <div className="flex-none bg-background/95 backdrop-blur p-0">
+        <div className="max-w-3xl mx-auto">
           <form 
-          className="mt-auto bg-blue-500"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            await handleSend();
-          }}>
-                  
+            className="mt-auto"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await handleSend();
+            }}
+          >
             <MessageInput
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -110,8 +131,6 @@ export default function Home({
           </form>
         </div>
       </div>
-    </div>
     </ChatContainer>
-    
   );
 }
