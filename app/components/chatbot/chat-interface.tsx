@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { readStreamableValue } from 'ai/rsc';
-import { Message } from '@/app/[chat]/actions';
 import { continueConversation } from '@/app/[chat]/actions';
 import { MessageInput } from '@/components/ui/message-input';
-import { MessageList } from "@/components/ui/message-list"
+import { MessageList } from "@/components/ui/message-list";
 import { ChatContainer, ChatMessages } from '@/components/ui/chat';
+
+// Assuming your Drizzle Message type is imported like this:
+// import type { Message } from '@/db/schema/chat-schema';
 
 export default function ChatInterface({ 
   providerId, 
@@ -18,29 +20,35 @@ export default function ChatInterface({
   providerId: string; 
   modelId: string;
   systemPrompt: string;
-  initialMessages: Message[];
+  initialMessages: any[]; // or use your Message type from Drizzle
   chatId: string;
 }) {
-  const [conversation, setConversation] = useState<Message[]>(initialMessages);
+  const [conversation, setConversation] = useState<any[]>(initialMessages);
   const [input, setInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
-  // Prevent multiple auto calls on mount
+  // Use a ref to ensure the auto-trigger happens only once.
   const autoTriggered = useRef(false);
 
   const handleSend = async () => {
     setIsGenerating(true);
     try {
-      // Create new user message manually
+      // Create a new user message that matches your schema
       const newUserMessage = { 
-        id: Date.now().toString(), 
+        conversationId: chatId, // include if needed on the client
         role: 'user', 
-        content: input 
+        content: input,
+        position: conversation.length + 1,
+        createdAt: new Date(),
+        tokensUsed: 0,
+        metadata: {},
+        updatedAt: new Date()
       };
 
+      // Immediately update the conversation state
       setConversation(prev => [...prev, newUserMessage]);
       setInput('');
 
-      // Then process the AI response
+      // Process the AI response
       const { messages, newMessage } = await continueConversation(
         [...conversation, newUserMessage],
         providerId,
@@ -52,14 +60,18 @@ export default function ChatInterface({
       let textContent = '';
       for await (const delta of readStreamableValue(newMessage)) {
         textContent += delta;
+        // Update the conversation with the assistant's response as it streams in.
         setConversation([
           ...messages,
           { 
-            id: Date.now().toString(), 
+            conversationId: chatId,
             role: 'assistant', 
             content: textContent,
             position: messages.length + 1,
-            createdAt: new Date()
+            createdAt: new Date(),
+            tokensUsed: 0,
+            metadata: {},
+            updatedAt: new Date()
           },
         ]);
       }
@@ -68,10 +80,10 @@ export default function ChatInterface({
     }
   };
 
-  // Auto-trigger assistant response if only the initial user message is present
+  // Automatically trigger the assistant response if there's only the initial user message
   useEffect(() => {
     if (conversation.length === 1 && conversation[0].role === 'user' && !autoTriggered.current) {
-      autoTriggered.current = true; // ensure it's triggered only once
+      autoTriggered.current = true;
       (async () => {
         setIsGenerating(true);
         try {
@@ -87,12 +99,15 @@ export default function ChatInterface({
             textContent += delta;
             setConversation([
               ...messages,
-              { 
-                id: Date.now().toString(), 
+              {  
+                conversationId: chatId,
                 role: 'assistant', 
                 content: textContent,
                 position: messages.length + 1,
-                createdAt: new Date()
+                createdAt: new Date(),
+                tokensUsed: 0,
+                metadata: {},
+                updatedAt: new Date()
               },
             ]);
           }
