@@ -1,80 +1,44 @@
-import { db } from '../../db/connection';
-import { agents } from '../../db/schema/agents';
-import { eq } from 'drizzle-orm';
-import ChatInterface from '../components/chatbot/chat-interface';
-import { providers } from '@/db/schema/providers';
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { SettingsIcon } from "lucide-react";
+import { notFound } from "next/navigation"
+import { agents } from "@/db/schema/agents"
+import { db } from "@/db/connection"
+import { eq } from "drizzle-orm"
+import { NewChatInterface } from "@/components/new-chat-interface"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 
-import { models } from '../../db/schema/models';
+async function getAgentBySlug(slug: string) {
+  // Replace with actual database query
+  const agent = await db.select().from(agents).where(eq(agents.agent, slug))
+  return agent[0]
+}
 
-
-export default async function ChatPage({ params }: { params: { chat: string } }) {
-  const { chat } = await params;
-  const result = await db
-    .select({
-      agent: agents,
-      providerName: providers.provider,
-      modelName: models.model,
+export default async function Page({
+  params,
+}: {
+  params: { chat: string }
+}) {
+    const session = await auth.api.getSession({
+        headers: await headers()
     })
-    .from(agents)
-    .leftJoin(providers, eq(agents.provider, providers.id))
-    .leftJoin(models, eq(agents.model, models.id))
-    .where(eq(agents.agent, chat))
-    .limit(1);
+    
+    // console.log("The user id is", session?.user?.id)
 
-  if (!result[0]?.agent) {
-    return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold">Agent Not Found</h1>
-        <p className="mt-2 text-gray-600">
-          The agent with ID {chat} could not be found.
-        </p>
-      </div>
-    );
-  }
-
-  const data = result[0].agent;
-  const providerName = result[0].providerName;
-  const modelName = result[0].modelName;
-
-  if (!providerName) {
-    return <div>Invalid provider: {data.provider}</div>;
-  }
-
-  if (!modelName) {
-    return <div>Model ID is required</div>;
+  // Destructure after awaiting params
+  const { chat } = await params
+  const agent = await getAgentBySlug(chat)
+  
+  if (!agent) {
+    notFound()
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
-      <div className="flex-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center">
-          <h1 className="text-lg font-semibold ml-14">{data.agent_display_name}</h1>
-          <div className="ml-auto">
-            <Link href={`/agents/${data.agent}`}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-muted"
-                title="Agent settings"
-              >
-                <SettingsIcon className="h-5 w-5" />
-                <span className="sr-only">Agent Settings</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex-1 overflow-hidden">
-        <ChatInterface 
-          providerId={providerName} 
-          modelId={modelName}
-          systemPrompt={data.system_prompt}
-        />
-      </div>
+    <div className="container max-w-3xl mx-auto p-4 h-full bg-red-500">
+      <NewChatInterface 
+      agentId={agent.id}
+      agentName={agent.agent_display_name} 
+      userId={session?.user?.id ?? ""}
+      chat={chat}
+      />
     </div>
-  );
+  )
 }

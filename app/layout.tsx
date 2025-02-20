@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { Sidebar } from "@/components/sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,13 +33,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SiteHeader session={
-          sessionResponse ? {
-            ...sessionResponse.session,
-            user: sessionResponse.user
-          } : null
-        } />
-        {children}
+        <SiteHeader session={sessionResponse?.session || null} />
+        <div className="flex">
+          <Sidebar />
+          <main className="flex-1 ml-64 p-4">{children}</main>
+        </div>
       </body>
     </html>
   );

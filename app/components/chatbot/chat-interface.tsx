@@ -9,16 +9,21 @@ import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list"
 
 
+
 export default function Home({ 
   providerId, 
   modelId,
-  systemPrompt
+  systemPrompt,
+  initialMessages,
+  chatId
 }: { 
   providerId: string; 
   modelId: string;
   systemPrompt: string;
+  initialMessages: Message[];
+  chatId: string;
 }) {
-  const [conversation, setConversation] = useState<Message[]>([]);
+  const [conversation, setConversation] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -41,7 +46,8 @@ export default function Home({
         [...conversation, newUserMessage as Message],
         providerId,
         modelId,
-        systemPrompt
+        systemPrompt,
+        chatId
       );
 
       let textContent = '';
