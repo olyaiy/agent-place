@@ -26,7 +26,6 @@ export default async function ChatPage({ params }: { params: Promise<{
     .where(eq(messages.conversationId, chatId))
     .orderBy(messages.position);
 
-  console.log('Messages for conversation', chatId, conversationMessages);
 
   const result = await db
     .select({

@@ -7,6 +7,7 @@ import { Message } from '@/app/[chat]/actions';
 import { continueConversation } from '@/app/[chat]/actions';
 import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list"
+import { ChatContainer } from '@/components/ui/chat';
 
 
 
@@ -57,7 +58,13 @@ export default function Home({
         textContent = `${textContent}${delta}`;
         setConversation([
           ...messages,
-          { id: Date.now().toString(), role: 'assistant', content: textContent },
+          { 
+            id: Date.now().toString(), 
+            role: 'assistant', 
+            content: textContent,
+            position: messages.length + 1,
+            createdAt: new Date()
+          },
         ]);
       }
     } finally {
@@ -66,6 +73,8 @@ export default function Home({
   };
 
   return (
+    <ChatContainer>
+
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-3xl mx-auto">
@@ -78,10 +87,12 @@ export default function Home({
 
       <div className="flex-none  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-0">
         <div className="max-w-3xl mx-auto">
+
           <form onSubmit={async (e) => {
             e.preventDefault();
             await handleSend();
           }}>
+                  
             <MessageInput
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -95,5 +106,7 @@ export default function Home({
         </div>
       </div>
     </div>
+    </ChatContainer>
+    
   );
 }
