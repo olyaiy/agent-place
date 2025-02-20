@@ -8,7 +8,7 @@ export default async function NewProviderPage() {
     
     await db.insert(providers).values({
       provider_display_name: formData.get("displayName") as string,
-      provider: formData.get("providerId") as string,
+      provider: formData.get("provider") as string,
     });
 
     redirect("/providers");
@@ -31,12 +31,12 @@ export default async function NewProviderPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="providerId">
-            Provider ID
+          <label className="block text-sm font-medium" htmlFor="provider">
+            Provider
           </label>
           <input
-            id="providerId"
-            name="providerId"
+            id="provider"
+            name="provider"
             required
             className="w-full p-2 border rounded-md"
           />

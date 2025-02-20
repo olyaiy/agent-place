@@ -9,3 +9,4 @@ export const models = pgTable("models", {
 });
 
 export type Model = typeof models.$inferSelect;
+

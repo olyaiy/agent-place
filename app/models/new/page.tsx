@@ -11,7 +11,7 @@ export default async function NewModelPage() {
     
     await db.insert(models).values({
       model_display_name: formData.get("modelName") as string,
-      model: formData.get("modelId") as string,
+      model: formData.get("model") as string,
       provider: formData.get("providerId") as string || null,
     });
 
@@ -35,12 +35,12 @@ export default async function NewModelPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="modelId">
-            Model ID
+          <label className="block text-sm font-medium" htmlFor="model">
+            Model
           </label>
           <input
-            id="modelId"
-            name="modelId"
+            id="model"
+            name="model"
             required
             className="w-full p-2 border rounded-md"
           />

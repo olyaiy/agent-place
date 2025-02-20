@@ -24,11 +24,11 @@ export default async function ProviderEditPage({
       .update(providers)
       .set({
         provider_display_name: formData.get("displayName") as string,
-        provider: formData.get("providerId") as string,
+        provider: formData.get("provider") as string,
       })
       .where(eq(providers.id, provider.id));
 
-    redirect(`/providers/${formData.get("providerId")}`);
+    redirect(`/providers/${formData.get("provider")}`);
   }
 
   return (
@@ -51,12 +51,12 @@ export default async function ProviderEditPage({
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="providerId">
-            Provider ID
+          <label className="block text-sm font-medium" htmlFor="provider">
+            Provider
           </label>
           <input
-            id="providerId"
-            name="providerId"
+            id="provider"
+            name="provider"
             required
             defaultValue={provider.provider}
             className="w-full p-2 border rounded-md"

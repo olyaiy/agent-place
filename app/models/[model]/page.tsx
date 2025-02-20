@@ -30,12 +30,12 @@ export default async function ModelEditPage({
       .update(models)
       .set({
         model_display_name: formData.get("modelName") as string,
-        model: formData.get("modelId") as string,
+        model: formData.get("model") as string,
         provider: formData.get("providerId") as string || null,
       })
       .where(eq(models.id, model.id));
 
-    redirect(`/models/${formData.get("modelId")}`);
+    redirect(`/models/${formData.get("model")}`);
   }
 
   return (
@@ -58,12 +58,12 @@ export default async function ModelEditPage({
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium" htmlFor="modelId">
+          <label className="block text-sm font-medium" htmlFor="model">
             Model ID
           </label>
           <input
-            id="modelId"
-            name="modelId"
+            id="model"
+            name="model"
             required
             defaultValue={model.model}
             className="w-full p-2 border rounded-md"
