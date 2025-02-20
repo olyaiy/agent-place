@@ -11,7 +11,7 @@ import { eq, max } from 'drizzle-orm';
 export interface Message {
   id: string;
   role: 'system' | 'user' | 'assistant' | 'tool';
-  content: string | null;
+  content: string;
   position: number;
   createdAt: Date;
 }

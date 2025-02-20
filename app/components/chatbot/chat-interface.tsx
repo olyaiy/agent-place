@@ -7,7 +7,7 @@ import { Message } from '@/app/[chat]/actions';
 import { continueConversation } from '@/app/[chat]/actions';
 import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list"
-import { ChatContainer } from '@/components/ui/chat';
+import { ChatContainer, ChatMessages } from '@/components/ui/chat';
 
 
 
@@ -78,17 +78,22 @@ export default function Home({
     <div className="flex flex-col h-full overflow-y-scroll">
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-3xl mx-auto mt-auto">
+        <ChatMessages messages={conversation} > 
           <MessageList
             messages={conversation}
             isTyping={isGenerating}
           />
+        </ChatMessages>
+
         </div>
       </div>
 
       <div className="flex-none  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-0">
         <div className="max-w-3xl mx-auto bg-red-500 mt-atuo">
 
-          <form onSubmit={async (e) => {
+          <form 
+          className="mt-auto bg-blue-500"
+          onSubmit={async (e) => {
             e.preventDefault();
             await handleSend();
           }}>
