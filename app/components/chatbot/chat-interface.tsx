@@ -75,9 +75,9 @@ export default function Home({
   return (
     <ChatContainer>
 
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-y-scroll">
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto mt-auto">
           <MessageList
             messages={conversation}
             isTyping={isGenerating}
@@ -86,7 +86,7 @@ export default function Home({
       </div>
 
       <div className="flex-none  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-0">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto bg-red-500 mt-atuo">
 
           <form onSubmit={async (e) => {
             e.preventDefault();
