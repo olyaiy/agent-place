@@ -26,16 +26,10 @@ export function SiteHeader() {
           ) : (
             <div className="flex gap-4">
               <Link 
-                href={`/signin?callbackUrl=${encodeURIComponent(pathname)}`} 
+                href={`/auth-form?callbackUrl=${encodeURIComponent(pathname)}`} 
                 className="text-sm font-medium hover:underline"
               >
-                Sign in
-              </Link>
-              <Link 
-                href={`/signup?callbackUrl=${encodeURIComponent(pathname)}`} 
-                className="text-sm font-medium hover:underline"
-              >
-                Sign up
+                Sign In / Sign Up
               </Link>
             </div>
           )}
