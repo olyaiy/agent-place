@@ -78,7 +78,7 @@ export function Sidebar() {
                   href={`/${conv.agentSlug}/${conv.id}`}
                   // On click, immediately set this conversation as active
                   onClick={() => setOptimisticConversationId(conv.id)}
-                  className={`block p-2 rounded transition-colors ${
+                  className={`block p-2 rounded transition-colors duration-25 ${
                     isActive ? "bg-gray-300" : "hover:bg-gray-100"
                   }`}
                 >
