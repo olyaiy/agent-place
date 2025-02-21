@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Agent } from '../../db/schema/agents';
-import { Settings, Plus } from "lucide-react";
+import { Settings, Plus, Lock } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,15 +17,8 @@ export function AgentList({ items }: { items: Agent[] }) {
     setAgents(items);
   }, [items]);
 
-  // If you want a consistent grey gradient, ignore the id:
   const getGradientBackground = () =>
     'linear-gradient(135deg, hsl(0, 0%, 85%) 0%, hsl(0, 0%, 65%) 100%)';
-  
-  // Or, if you want to vary the gradient based on the agent id:
-  // const getGradientBackground = (id: number) => {
-  //   const hue = (id * 60) % 360;
-  //   return `linear-gradient(135deg, hsl(${hue}, 15%, 85%) 0%, hsl(${hue}, 15%, 65%) 100%)`;
-  // };
 
   const handleCardClick = (agentPath: string, e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.settings-button')) {
@@ -37,11 +30,21 @@ export function AgentList({ items }: { items: Agent[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {agents.map((agent) => (
-        <Card 
-          key={agent.id} 
+        <Card
+          key={agent.id}
           className="relative h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer group"
           onClick={(e) => handleCardClick(agent.agent, e)}
         >
+          {agent.visibility === 'private' && (
+            <Badge 
+              variant="secondary" 
+              className="absolute top-2 left-2 z-20 bg-gray-800 text-white"
+            >
+              <Lock className="w-3 h-3 mr-1" />
+              Private
+            </Badge>
+          )}
+          
           <Link
             href={`/agents/${agent.agent}`}
             className="settings-button absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -51,10 +54,10 @@ export function AgentList({ items }: { items: Agent[] }) {
             </Button>
           </Link>
 
-          <div 
+          <div
             className="h-32 rounded-t-lg"
             style={{
-              background: agent.image_url 
+              background: agent.image_url
                 ? `${getGradientBackground()}, url(${agent.image_url}) center/cover no-repeat`
                 : getGradientBackground()
             }}
@@ -96,6 +99,6 @@ export function AgentList({ items }: { items: Agent[] }) {
       </Link>
     </div>
   );
-};
+}
 
 export default AgentList;
