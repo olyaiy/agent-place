@@ -6,6 +6,7 @@ import { TypingIndicator } from "@/components/ui/typing-indicator"
 import type { Message } from "@/app/[chat]/actions"
 import { CopyButton } from "./copy-button"
 import { DeleteButton } from "./delete-button"
+import { RetryButton } from "./retry-button"
 
 type AdditionalMessageOptions = Omit<ChatMessageProps, keyof Message>
 
@@ -14,6 +15,8 @@ interface MessageListProps {
   showTimeStamps?: boolean
   isTyping?: boolean
   onDeleteMessage?: (messageId: string) => void
+  onRetryMessage?: (messageId: string) => void   // <-- new prop
+
   messageOptions?:
     | AdditionalMessageOptions
     | ((message: Message) => AdditionalMessageOptions)
@@ -25,6 +28,7 @@ export function MessageList({
   isTyping = false,
   messageOptions,
   onDeleteMessage,
+  onRetryMessage,
 }: MessageListProps) {
   
   return (
@@ -51,6 +55,12 @@ export function MessageList({
                     onClick={() => onDeleteMessage(message.id)}
                   />
                 
+                )}
+
+              {onRetryMessage && message.role === "assistant" && (
+                  <RetryButton
+                    onClick={() => onRetryMessage(message.id)}
+                  />
                 )}
               </>
             }

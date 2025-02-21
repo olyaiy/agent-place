@@ -12,12 +12,7 @@ import { authClient } from '@/lib/auth-client';
 // Assuming your Drizzle Message type is imported like this:
 // import type { Message } from '@/db/schema/chat-schema';
 
-export default function ChatInterface({ 
-  providerId, 
-  modelId,
-  systemPrompt,
-  initialMessages,
-  chatId
+export default function ChatInterface({ providerId, modelId, systemPrompt, initialMessages, chatId
 }: { 
   providerId: string; 
   modelId: string;
@@ -35,7 +30,7 @@ export default function ChatInterface({
   // Use a ref to ensure the auto-trigger happens only once.
   const autoTriggered = useRef(false);
 
-  const handleSend = async () => {
+const handleSend = async () => {
     setIsGenerating(true);
     try {
       // Create a new user message that our schema
@@ -176,6 +171,49 @@ export default function ChatInterface({
 
 
 
+  const handleRetryMessage = async (messageId: string) => {
+    setIsGenerating(true);
+    try {
+      // Remove the old assistant message from the conversation state
+      const updatedConversation = conversation.filter(m => m.id !== messageId);
+      setConversation(updatedConversation);
+  
+      // Continue the conversation using the updated conversation history
+      const { messages, newMessage } = await continueConversation(
+        updatedConversation,
+        providerId,
+        modelId,
+        systemPrompt,
+        chatId
+      );
+  
+      let textContent = '';
+      for await (const delta of readStreamableValue(newMessage)) {
+        textContent += delta;
+        // Update the conversation with the new assistant message
+        setConversation([
+          ...messages,
+          {
+            conversationId: chatId,
+            role: 'assistant',
+            content: textContent,
+            position: messages.length + 1,
+            createdAt: new Date(),
+            tokensUsed: 0,
+            metadata: {},
+            updatedAt: new Date(),
+          },
+        ]);
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+
+
+
+
 
   return (
     <ChatContainer className="h-full">
@@ -185,6 +223,8 @@ export default function ChatInterface({
           messages={conversation} 
           isTyping={isGenerating} 
           onDeleteMessage={handleDeleteMessage}
+          onRetryMessage={handleRetryMessage}
+
           />
         </div>
       </ChatMessages>
