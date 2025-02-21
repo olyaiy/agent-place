@@ -107,6 +107,7 @@ export default function AgentForm({
               id="modelId"
               name="modelId"
               defaultValue={defaultValues.modelId || ""}
+              required
               className="w-full p-2 border rounded-md"
             >
               <option value="">Select a model</option>
@@ -126,6 +127,7 @@ export default function AgentForm({
               id="providerId"
               name="providerId"
               defaultValue={defaultValues.providerId || ""}
+              required
               className="w-full p-2 border rounded-md"
             >
               <option value="">Select a provider</option>
