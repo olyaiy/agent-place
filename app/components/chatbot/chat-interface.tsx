@@ -155,14 +155,24 @@ export default function ChatInterface({
 
 
   const handleDeleteMessage = async (messageId: string) => {
-    // First, remove from DB
-    await deleteMessage(messageId)
+    // 1. Store the old state
+    const oldConversation = conversation
 
-    // Then update local state
-    setConversation(prevMessages =>
-      prevMessages.filter(m => m.id !== messageId)
-    )
+    // 2. Optimistically remove the message from state
+    setConversation(prev => prev.filter(m => m.id !== messageId))
+
+    try {
+      // 3. Server action to delete the message in DB
+      await deleteMessage(messageId)
+      // If successful, do nothing else — UI is already updated!
+      
+    } catch (error) {
+      // If the server call fails, revert to the old state
+      setConversation(oldConversation)
+      console.error("Failed to delete message:", error)
+    }
   }
+
 
 
 
