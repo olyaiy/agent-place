@@ -181,5 +181,12 @@ export async function createConversationTitle(
   }
 }
 
+export async function deleteMessage(messageId: string) {
+  "use server"
+
+  // Delete the message record from the DB
+  await db.delete(messages).where(eq(messages.id, messageId))
+}
+
 
 

@@ -5,6 +5,7 @@ import {
 import { TypingIndicator } from "@/components/ui/typing-indicator"
 import type { Message } from "@/app/[chat]/actions"
 import { CopyButton } from "./copy-button"
+import { DeleteButton } from "./delete-button"
 
 type AdditionalMessageOptions = Omit<ChatMessageProps, keyof Message>
 
@@ -12,7 +13,7 @@ interface MessageListProps {
   messages: Message[]
   showTimeStamps?: boolean
   isTyping?: boolean
-  onDeleteMessage?: (index: number) => void;
+  onDeleteMessage?: (messageId: string) => void
   messageOptions?:
     | AdditionalMessageOptions
     | ((message: Message) => AdditionalMessageOptions)
@@ -46,15 +47,14 @@ export function MessageList({
                   copyMessage="Copied message to clipboard!"
                 />
                 {onDeleteMessage && (
-                  <button
-                    className="px-2 py-1 text-sm border rounded hover:bg-muted"
-                    onClick={() => onDeleteMessage(index)}
-                  >
-                    Delete
-                  </button>
+                  <DeleteButton
+                    onClick={() => onDeleteMessage(message.id)}
+                  />
+                
                 )}
               </>
             }
+
             
             {...message}
             {...additionalOptions}

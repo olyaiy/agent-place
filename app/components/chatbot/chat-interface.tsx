@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { readStreamableValue } from 'ai/rsc';
-import { continueConversation, createConversationTitle } from '@/app/[chat]/actions';
+import { continueConversation, createConversationTitle, deleteMessage } from '@/app/[chat]/actions';
 import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list";
 import { ChatContainer, ChatMessages } from '@/components/ui/chat';
@@ -154,16 +154,15 @@ export default function ChatInterface({
 
 
 
-  const handleDeleteMessage = (index: number) => {
-    setConversation(prev => {
-      const newMessages = [...prev];
-      newMessages.splice(index, 1); // remove message at this index
-      return newMessages;
-    });
+  const handleDeleteMessage = async (messageId: string) => {
+    // First, remove from DB
+    await deleteMessage(messageId)
 
-    // If you also want to delete from the DB, you’d make an API call here,
-    // e.g., await deleteMessageFromDB(conversation[index].id)
-  };
+    // Then update local state
+    setConversation(prevMessages =>
+      prevMessages.filter(m => m.id !== messageId)
+    )
+  }
 
 
 

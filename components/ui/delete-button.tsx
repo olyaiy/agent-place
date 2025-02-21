@@ -1,19 +1,20 @@
-// DeleteButton.tsx
-import { TrashIcon } from "lucide-react";
+// components/ui/delete-button.tsx
+import { Trash } from "lucide-react";
 
 interface DeleteButtonProps {
-  onDelete: () => void;
-  deleteMessage?: string;
+  onClick: () => void;
+  tooltip?: string;
 }
 
-export function DeleteButton({ onDelete, deleteMessage = "Message deleted." }: DeleteButtonProps) {
+export function DeleteButton({ onClick, tooltip = "Delete message" }: DeleteButtonProps) {
   return (
     <button
-      onClick={onDelete}
-      className="flex items-center space-x-1 rounded bg-red-500 p-1 text-white hover:bg-red-600"
+      onClick={onClick}
+      className="p-1 rounded hover:bg-red-100 text-red-600 transition duration-200"
+      aria-label={tooltip}
+      title={tooltip}
     >
-      <TrashIcon className="h-4 w-4" />
-      <span>{deleteMessage}</span>
+      <Trash className="h-4 w-4" />
     </button>
   );
 }
