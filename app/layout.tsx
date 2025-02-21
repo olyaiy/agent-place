@@ -31,14 +31,17 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-none`}>
+    <html lang="en" className="h-full overflow-hidden">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased  h-full overflow-hidden`}
+      >
         <SiteHeader session={sessionResponse?.session || null} />
-        <div className="flex h-full">
+        <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
           <Sidebar />
-          <main className="flex-1 ml-64 p-4 h-full">{children}</main>
+          <main className="flex-1 ml-64 p-4 h-full overflow-hidden">{children}</main>
         </div>
       </body>
     </html>
   );
+  
 }
