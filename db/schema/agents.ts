@@ -1,6 +1,7 @@
 import { pgTable, uuid, varchar, text, pgEnum } from "drizzle-orm/pg-core";
 import { models } from "./models";
 import { providers } from "./providers";
+import { user } from "./auth-schema";
 
 export const visibilityEnum = pgEnum("visibility", ["public", "private", "link"]);
 
@@ -14,6 +15,7 @@ export const agents = pgTable("agents", {
   model: uuid("model").references(() => models.id),
   provider: uuid("provider").references(() => providers.id),
   visibility: visibilityEnum("visibility").default("public"),
+  creatorId: text("creator_id").references(() => user.id),
 
 });
 
