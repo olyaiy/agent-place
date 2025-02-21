@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Agent } from '../../db/schema/agents';
-import { Settings, Plus, Bot } from "lucide-react";
+import { Settings, Plus } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +17,15 @@ export function AgentList({ items }: { items: Agent[] }) {
     setAgents(items);
   }, [items]);
 
-  const getGradientBackground = (id: number) => {
-    const hue = (id * 60) % 360;
-    return `linear-gradient(135deg, hsl(${hue}, 15%, 85%) 0%, hsl(${hue}, 15%, 65%) 100%)`;
-  };
+  // If you want a consistent grey gradient, ignore the id:
+  const getGradientBackground = () =>
+    'linear-gradient(135deg, hsl(0, 0%, 85%) 0%, hsl(0, 0%, 65%) 100%)';
+  
+  // Or, if you want to vary the gradient based on the agent id:
+  // const getGradientBackground = (id: number) => {
+  //   const hue = (id * 60) % 360;
+  //   return `linear-gradient(135deg, hsl(${hue}, 15%, 85%) 0%, hsl(${hue}, 15%, 65%) 100%)`;
+  // };
 
   const handleCardClick = (agentPath: string, e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('.settings-button')) {
@@ -37,7 +42,6 @@ export function AgentList({ items }: { items: Agent[] }) {
           className="relative h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer group"
           onClick={(e) => handleCardClick(agent.agent, e)}
         >
-          {/* Settings Button */}
           <Link
             href={`/agents/${agent.agent}`}
             className="settings-button absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -47,21 +51,14 @@ export function AgentList({ items }: { items: Agent[] }) {
             </Button>
           </Link>
 
-          {/* Header Image */}
           <div 
-            className="h-32 rounded-t-lg overflow-hidden"
+            className="h-32 rounded-t-lg"
             style={{
               background: agent.image_url 
-                ? `url(${agent.image_url}) center/cover no-repeat` 
-                : getGradientBackground(agent.id)
+                ? `${getGradientBackground()}, url(${agent.image_url}) center/cover no-repeat`
+                : getGradientBackground()
             }}
-          >
-            {!agent.image_url && (
-              <div className="w-full h-full flex items-center justify-center">
-                <Bot className="w-12 h-12 text-gray-400" />
-              </div>
-            )}
-          </div>
+          />
 
           <CardHeader className="space-y-1 pt-4">
             <div className="flex items-start">
