@@ -267,9 +267,9 @@ const handleSend = async () => {
 
 
   return (
-    <ChatContainer className="h-full mt-4">
+    <ChatContainer className="h-full mt-0 ">
       <ChatMessages messages={conversation}>
-        <div className="max-w-3xl mx-auto mt-auto">
+        <div className="max-w-3xl mx-auto mt-auto pt-4">
           <MessageList 
           messages={conversation} 
           isTyping={isGenerating} 
@@ -280,7 +280,7 @@ const handleSend = async () => {
           />
         </div>
       </ChatMessages>
-      <div className="flex-none bg-background/95 backdrop-blur p-0">
+      <div className="flex-none bg-background/95 backdrop-blur p-0 ">
         <div className="max-w-3xl mx-auto">
           <form 
             className="mt-auto"
