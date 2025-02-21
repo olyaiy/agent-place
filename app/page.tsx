@@ -39,8 +39,8 @@ async function Agents() {
 export default function Home() {
   return (
     <main className="space-y-8">
-      <Providers />
-      <Models />
+      {/* <Providers /> */}
+      {/* <Models /> */}
       <Agents />
     </main>
   );
