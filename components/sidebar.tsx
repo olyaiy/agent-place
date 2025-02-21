@@ -4,7 +4,7 @@ import { authClient } from "@/lib/auth-client";
 import useSWR from "swr";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -14,11 +14,19 @@ export function Sidebar() {
   const segments = pathname.split("/");
   const currentConversationId = segments[2];
 
-  // If session is unavailable, no need to fetch
+  // Track conversations
   const { data: conversations = [], mutate } = useSWR(
     session?.user?.id ? `/api/conversations?userId=${session.user.id}` : null,
     fetcher
   );
+
+  // Minimal addition: store optimistic ID
+  const [optimisticConversationId, setOptimisticConversationId] = useState(currentConversationId);
+
+  // Whenever the actual route changes, sync the local state
+  useEffect(() => {
+    setOptimisticConversationId(currentConversationId);
+  }, [currentConversationId]);
 
   const handleDelete = useCallback(
     async (e: React.MouseEvent, conversationId: string) => {
@@ -29,37 +37,28 @@ export function Sidebar() {
         return;
       }
 
-      // 1) Save the current list of conversations (for potential revert)
       const previousConversations = [...conversations];
-
-      // 2) Optimistically remove the conversation from the UI
       mutate(
         (current: typeof conversations) => current.filter(c => c.id !== conversationId),
-        false // don't revalidate yet
+        false
       );
 
       try {
-        // 3) Attempt to delete on the server
         const res = await fetch(`/api/conversations/${conversationId}`, {
           method: "DELETE",
         });
-
         if (!res.ok) {
           throw new Error("Error deleting conversation on the server.");
         }
-
-        // 4) If successful, trigger a revalidation to confirm (optional but recommended)
         mutate();
       } catch (error) {
         console.error("Error deleting conversation:", error);
-        // 5) If it fails, revert to the previous list
         mutate(previousConversations, false);
       }
     },
     [conversations, mutate]
   );
 
-  // If no session, show nothing
   if (!session) return null;
 
   return (
@@ -70,11 +69,15 @@ export function Sidebar() {
           <p className="text-gray-500">No conversations to show</p>
         ) : (
           conversations.map((conv) => {
-            const isActive = currentConversationId === conv.id;
+            // Use the optimistic ID instead of the server's route ID
+            const isActive = optimisticConversationId === conv.id;
+
             return (
               <div key={conv.id} className="relative group">
                 <Link
                   href={`/${conv.agentSlug}/${conv.id}`}
+                  // On click, immediately set this conversation as active
+                  onClick={() => setOptimisticConversationId(conv.id)}
                   className={`block p-2 rounded transition-colors ${
                     isActive ? "bg-gray-300" : "hover:bg-gray-100"
                   }`}
