@@ -101,8 +101,7 @@ export async function continueConversation(
     stream.done();
   })();
 
-  console.log(modelId);
-  console.log(providerId);
+
   return {
     messages: history,
     newMessage: stream.value,
