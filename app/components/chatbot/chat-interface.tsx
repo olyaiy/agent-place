@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { readStreamableValue } from 'ai/rsc';
-import { continueConversation, createConversationTitle, deleteMessage } from '@/app/[chat]/actions';
+import { continueConversation, createConversationTitle, deleteMessage, updateMessage } from '@/app/[chat]/actions';
 import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list";
 import { ChatContainer, ChatMessages } from '@/components/ui/chat';
@@ -27,15 +27,24 @@ export default function ChatInterface({ providerId, modelId, systemPrompt, initi
   
   const [input, setInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // For editing a message
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingMessageContent, setEditingMessageContent] = useState<string>('');
+
+
   // Use a ref to ensure the auto-trigger happens only once.
   const autoTriggered = useRef(false);
 
 const handleSend = async () => {
+  const ephemeralId = crypto.randomUUID();
+
     setIsGenerating(true);
     try {
       // Create a new user message that our schema
       const newUserMessage = { 
         conversationId: chatId, // include if needed on the client
+        id: ephemeralId,
         role: 'user', 
         content: input,
         position: conversation.length + 1,
@@ -214,6 +223,48 @@ const handleSend = async () => {
 
 
 
+  const handleBeginEditMessage = (messageId: string, oldContent: string) => {
+    setEditingMessageId(messageId);
+    setEditingMessageContent(oldContent);
+  };
+
+  // Cancel edit mode
+  const handleCancelEditMessage = () => {
+    setEditingMessageId(null);
+    setEditingMessageContent('');
+  };
+
+  // Actually save the edited content to the database
+  const handleSaveEditMessage = async () => {
+    if (!editingMessageId) return;
+
+    const oldConversation = [...conversation];
+
+    // 1. Optimistically update local state
+    setConversation(prev => 
+      prev.map(msg => 
+        msg.id === editingMessageId
+          ? { ...msg, content: editingMessageContent }
+          : msg
+      )
+    );
+
+    try {
+      // 2. Call the server action to update the DB
+      await updateMessage(editingMessageId, editingMessageContent);
+    } catch (error) {
+      // If fails, revert local state
+      console.error("Failed to update message: ", error);
+      setConversation(oldConversation);
+    }
+
+    // 3. Clear edit state
+    setEditingMessageId(null);
+    setEditingMessageContent('');
+  };
+
+
+
 
   return (
     <ChatContainer className="h-full">
@@ -224,6 +275,7 @@ const handleSend = async () => {
           isTyping={isGenerating} 
           onDeleteMessage={handleDeleteMessage}
           onRetryMessage={handleRetryMessage}
+          onEditMessage={handleBeginEditMessage}
 
           />
         </div>
@@ -249,6 +301,35 @@ const handleSend = async () => {
           </form>
         </div>
       </div>
+
+      {/* Simple "Modal" or overlay for editing a message */}
+      {editingMessageId && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white p-4 rounded shadow-md max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-2">Edit Message</h2>
+            <textarea
+              className="w-full border rounded p-2"
+              rows={4}
+              value={editingMessageContent}
+              onChange={(e) => setEditingMessageContent(e.target.value)}
+            />
+            <div className="mt-3 flex justify-end space-x-2">
+              <button 
+                onClick={handleCancelEditMessage} 
+                className="px-3 py-1 text-sm bg-gray-200 rounded"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSaveEditMessage} 
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ChatContainer>
   );
 }

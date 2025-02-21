@@ -7,6 +7,7 @@ import type { Message } from "@/app/[chat]/actions"
 import { CopyButton } from "./copy-button"
 import { DeleteButton } from "./delete-button"
 import { RetryButton } from "./retry-button"
+import { EditButton } from "./edit-button"
 
 type AdditionalMessageOptions = Omit<ChatMessageProps, keyof Message>
 
@@ -16,6 +17,8 @@ interface MessageListProps {
   isTyping?: boolean
   onDeleteMessage?: (messageId: string) => void
   onRetryMessage?: (messageId: string) => void   // <-- new prop
+  onEditMessage?: (messageId: string, oldContent: string) => void;  // <--- new
+
 
   messageOptions?:
     | AdditionalMessageOptions
@@ -29,6 +32,7 @@ export function MessageList({
   messageOptions,
   onDeleteMessage,
   onRetryMessage,
+  onEditMessage,
 }: MessageListProps) {
   
   return (
@@ -41,7 +45,7 @@ export function MessageList({
 
         return (
           <ChatMessage
-            key={index}
+          key={message.id}
             showTimeStamp={showTimeStamps}
             // Pass the copy button as the action.
             actions={
@@ -60,6 +64,13 @@ export function MessageList({
               {onRetryMessage && message.role === "assistant" && (
                   <RetryButton
                     onClick={() => onRetryMessage(message.id)}
+                  />
+                )}
+
+
+{onEditMessage && (
+                  <EditButton
+                    onClick={() => onEditMessage(message.id, message.content)} 
                   />
                 )}
               </>

@@ -1,6 +1,6 @@
 'use server';
 
-import { streamText } from 'ai';
+import { LanguageModelV1, streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { createStreamableValue } from 'ai/rsc';
 import { deepseek } from '@ai-sdk/deepseek';
@@ -69,11 +69,20 @@ export async function continueConversation(
       content: userMessage.content,
       position: maxPosition + 1,
       createdAt: new Date()
+    })
+    .returning({
+      id: messages.id,
+      conversationId: messages.conversationId,
+      role: messages.role,
+      content: messages.content,
+      position: messages.position,
+      createdAt: messages.createdAt,
     });
+
 
     // Generate AI response
     const { textStream } = await streamText({
-      model: providerFn(modelId),
+      model: providerFn(modelId) as LanguageModelV1,
       system: systemPrompt,
       messages: history
         .filter(m => ['user', 'assistant'].includes(m.role))
@@ -96,7 +105,16 @@ export async function continueConversation(
       content: assistantContent,
       position: maxPosition + 2,
       createdAt: new Date()
+    })
+    .returning({
+      id: messages.id,
+      conversationId: messages.conversationId,
+      role: messages.role,
+      content: messages.content,
+      position: messages.position,
+      createdAt: messages.createdAt,
     });
+
 
     stream.done();
   })();
@@ -187,5 +205,15 @@ export async function deleteMessage(messageId: string) {
   await db.delete(messages).where(eq(messages.id, messageId))
 }
 
+
+
+export async function updateMessage(messageId: string, newContent: string) {
+  "use server";
+  
+  await db
+    .update(messages)
+    .set({ content: newContent, updatedAt: new Date() })
+    .where(eq(messages.id, messageId));
+}
 
 
