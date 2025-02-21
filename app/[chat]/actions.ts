@@ -161,7 +161,7 @@ export async function createConversationTitle(
 ) {
 
 
-  const titlePrompt = `Generate a short descriptive conversation title for the following message: "${initialMessage}"`;
+  const titlePrompt = `Generate a short descriptive summary title for the following message: "${initialMessage}"`;
 
   // Create a streamable value to collect the title text.
   const stream = createStreamableValue();
