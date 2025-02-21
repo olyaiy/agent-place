@@ -32,7 +32,7 @@ export default async function Page({
   }
 
   return (
-    <div className=" h-full flex flex-col justify-center items-center w-full">
+    <div className="container h-full flex flex-col justify-center items-center  max-auto justify-self-center">
       <NewChatInterface 
       agentId={agent.id}
       agentName={agent.agent_display_name} 

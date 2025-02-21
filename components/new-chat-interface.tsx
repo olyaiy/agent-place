@@ -61,7 +61,7 @@ export function NewChatInterface({
   }
 
   return (
-    <div className="flex flex-col w-full bg-green-500/10">
+    <div className="flex flex-col w-full max-w-3xl mb-60">
       <h1 className="text-2xl font-bold mb-8 text-center">{agentName}</h1>
       <div className="flex-1" /> {/* Spacer */}
       <div className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

@@ -4,6 +4,7 @@ import {
 } from "@/components/ui/chat-message"
 import { TypingIndicator } from "@/components/ui/typing-indicator"
 import type { Message } from "@/app/[chat]/actions"
+import { CopyButton } from "./copy-button"
 
 type AdditionalMessageOptions = Omit<ChatMessageProps, keyof Message>
 
@@ -11,6 +12,7 @@ interface MessageListProps {
   messages: Message[]
   showTimeStamps?: boolean
   isTyping?: boolean
+  onDeleteMessage?: (index: number) => void;
   messageOptions?:
     | AdditionalMessageOptions
     | ((message: Message) => AdditionalMessageOptions)
@@ -21,25 +23,45 @@ export function MessageList({
   showTimeStamps = true,
   isTyping = false,
   messageOptions,
+  onDeleteMessage,
 }: MessageListProps) {
+  
   return (
     <div className="space-y-4 overflow-visible">
       {messages.map((message, index) => {
         const additionalOptions =
           typeof messageOptions === "function"
             ? messageOptions(message)
-            : messageOptions
+            : messageOptions;
 
         return (
           <ChatMessage
             key={index}
             showTimeStamp={showTimeStamps}
+            // Pass the copy button as the action.
+            actions={
+              <>
+                <CopyButton
+                  content={message.content}
+                  copyMessage="Copied message to clipboard!"
+                />
+                {onDeleteMessage && (
+                  <button
+                    className="px-2 py-1 text-sm border rounded hover:bg-muted"
+                    onClick={() => onDeleteMessage(index)}
+                  >
+                    Delete
+                  </button>
+                )}
+              </>
+            }
+            
             {...message}
             {...additionalOptions}
           />
-        )
+        );
       })}
       {isTyping && <TypingIndicator />}
     </div>
-  )
+  );
 }

@@ -38,7 +38,7 @@ export default async function RootLayout({
         <SiteHeader session={sessionResponse?.session || null} />
         <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
           <Sidebar />
-          <main className="flex-1 p-4 h-full overflow-hidden w-full">{children}</main>
+          <main className="flex-1 p-4 h-full overflow-hidden w-full justify-center items-center">{children}</main>
         </div>
       </body>
     </html>

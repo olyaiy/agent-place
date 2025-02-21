@@ -26,6 +26,10 @@ export default function ChatInterface({
   chatId: string;
 }) {
   const [conversation, setConversation] = useState<any[]>(initialMessages);
+
+
+
+  
   const [input, setInput] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   // Use a ref to ensure the auto-trigger happens only once.
@@ -34,7 +38,7 @@ export default function ChatInterface({
   const handleSend = async () => {
     setIsGenerating(true);
     try {
-      // Create a new user message that matches your schema
+      // Create a new user message that our schema
       const newUserMessage = { 
         conversationId: chatId, // include if needed on the client
         role: 'user', 
@@ -77,10 +81,18 @@ export default function ChatInterface({
           },
         ]);
       }
+
+      
     } finally {
       setIsGenerating(false);
     }
   };
+
+
+
+
+
+
 
   // Automatically trigger the assistant response if there's only the initial user message
   useEffect(() => {
@@ -139,11 +151,32 @@ export default function ChatInterface({
   }, [conversation, providerId, modelId, systemPrompt, chatId]);
   
 
+
+
+
+  const handleDeleteMessage = (index: number) => {
+    setConversation(prev => {
+      const newMessages = [...prev];
+      newMessages.splice(index, 1); // remove message at this index
+      return newMessages;
+    });
+
+    // If you also want to delete from the DB, you’d make an API call here,
+    // e.g., await deleteMessageFromDB(conversation[index].id)
+  };
+
+
+
+
   return (
     <ChatContainer className="h-full">
       <ChatMessages messages={conversation}>
         <div className="max-w-3xl mx-auto mt-auto">
-          <MessageList messages={conversation} isTyping={isGenerating} />
+          <MessageList 
+          messages={conversation} 
+          isTyping={isGenerating} 
+          onDeleteMessage={handleDeleteMessage}
+          />
         </div>
       </ChatMessages>
       <div className="flex-none bg-background/95 backdrop-blur p-0">
