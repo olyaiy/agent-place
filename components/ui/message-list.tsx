@@ -45,7 +45,7 @@ export function MessageList({
 
         return (
           <ChatMessage
-          key={message.id}
+          key={index}
             showTimeStamp={showTimeStamps}
             // Pass the copy button as the action.
             actions={

@@ -14,35 +14,52 @@ export function Sidebar() {
   const segments = pathname.split("/");
   const currentConversationId = segments[2];
 
-  // Always call SWR even if session is not available. Providing a default value (empty array)
+  // If session is unavailable, no need to fetch
   const { data: conversations = [], mutate } = useSWR(
     session?.user?.id ? `/api/conversations?userId=${session.user.id}` : null,
     fetcher
   );
 
-  // Define handleDelete unconditionally to preserve hook ordering.
   const handleDelete = useCallback(
     async (e: React.MouseEvent, conversationId: string) => {
       e.stopPropagation();
       e.preventDefault();
-      if (!confirm("Are you sure you want to delete this conversation?")) return;
+
+      if (!confirm("Are you sure you want to delete this conversation?")) {
+        return;
+      }
+
+      // 1) Save the current list of conversations (for potential revert)
+      const previousConversations = [...conversations];
+
+      // 2) Optimistically remove the conversation from the UI
+      mutate(
+        (current: typeof conversations) => current.filter(c => c.id !== conversationId),
+        false // don't revalidate yet
+      );
+
       try {
+        // 3) Attempt to delete on the server
         const res = await fetch(`/api/conversations/${conversationId}`, {
           method: "DELETE",
         });
-        if (res.ok) {
-          mutate(); // revalidate conversation list
-        } else {
-          console.error("Failed to delete conversation");
+
+        if (!res.ok) {
+          throw new Error("Error deleting conversation on the server.");
         }
+
+        // 4) If successful, trigger a revalidation to confirm (optional but recommended)
+        mutate();
       } catch (error) {
         console.error("Error deleting conversation:", error);
+        // 5) If it fails, revert to the previous list
+        mutate(previousConversations, false);
       }
     },
-    [mutate]
+    [conversations, mutate]
   );
 
-  // If no session exists, show nothing (this return comes after all hooks)
+  // If no session, show nothing
   if (!session) return null;
 
   return (
@@ -52,7 +69,7 @@ export function Sidebar() {
         {conversations.length === 0 ? (
           <p className="text-gray-500">No conversations to show</p>
         ) : (
-          conversations.map((conv: { id: string; title: string; agentSlug: string }) => {
+          conversations.map((conv) => {
             const isActive = currentConversationId === conv.id;
             return (
               <div key={conv.id} className="relative group">
