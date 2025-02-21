@@ -31,7 +31,8 @@ export default function ChatInterface({ providerId, modelId, systemPrompt, initi
   // For editing a message
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingMessageContent, setEditingMessageContent] = useState<string>('');
-
+  const [animation, setAnimation] = useState<"none" | "scale">("scale");
+  
 
   // Use a ref to ensure the auto-trigger happens only once.
   const autoTriggered = useRef(false);
@@ -106,6 +107,8 @@ const handleSend = async () => {
       !autoTriggered.current
     ) {
       autoTriggered.current = true;
+
+      setAnimation("none");
   
       // Trigger the title creation in the background.
       (async () => {
@@ -149,6 +152,9 @@ const handleSend = async () => {
           }
         } finally {
           setIsGenerating(false);
+
+          
+
         }
       })();
     }
@@ -268,7 +274,7 @@ const handleSend = async () => {
 
   return (
     <ChatContainer className="h-full mt-0 ">
-      <ChatMessages messages={conversation}>
+      <ChatMessages messages={conversation} >
         <div className="max-w-3xl mx-auto mt-auto pt-4">
           <MessageList 
           messages={conversation} 
@@ -276,6 +282,7 @@ const handleSend = async () => {
           onDeleteMessage={handleDeleteMessage}
           onRetryMessage={handleRetryMessage}
           onEditMessage={handleBeginEditMessage}
+          animation={animation}
 
           />
         </div>

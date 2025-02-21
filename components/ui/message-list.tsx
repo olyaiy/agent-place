@@ -16,8 +16,9 @@ interface MessageListProps {
   showTimeStamps?: boolean
   isTyping?: boolean
   onDeleteMessage?: (messageId: string) => void
-  onRetryMessage?: (messageId: string) => void   // <-- new prop
-  onEditMessage?: (messageId: string, oldContent: string) => void;  // <--- new
+  onRetryMessage?: (messageId: string) => void
+  onEditMessage?: (messageId: string, oldContent: string) => void;
+  animation?: "none" | "scale";
 
 
   messageOptions?:
@@ -33,6 +34,7 @@ export function MessageList({
   onDeleteMessage,
   onRetryMessage,
   onEditMessage,
+  animation = "none",
 }: MessageListProps) {
   
   return (
@@ -45,9 +47,10 @@ export function MessageList({
 
         return (
           <ChatMessage
+          animation={animation} 
           key={index}
             showTimeStamp={showTimeStamps}
-            // Pass the copy button as the action.
+
             actions={
               <>
                 <CopyButton
