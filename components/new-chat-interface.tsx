@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { MessageInput } from "@/components/ui/message-input"
-import { createConversation } from "@/app/[chat]/actions"
+import { createConversation, createConversationTitle } from "@/app/[chat]/actions"
 import { useRouter } from "next/navigation"
+import { mutate } from "swr"
 
 export function NewChatInterface({
   agentName,
@@ -22,8 +23,26 @@ export function NewChatInterface({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const conversationId = await createConversation(userId, agentName, inputValue, agentId)
-    setInputValue("")
+
+  // 1. Create new conversation
+  const conversationId = await createConversation(
+    userId,
+    agentName,
+    inputValue,
+    agentId
+  );
+
+    // 2. Immediately clear input
+  setInputValue("");
+
+  
+
+
+  // 4. Mutate to refresh the conversation list right away (if desired)
+  mutate(`/api/conversations?userId=${userId}`);
+
+
+    // 
     router.push(`/${chat}/${conversationId}`)
   }
 

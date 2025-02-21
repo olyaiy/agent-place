@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { readStreamableValue } from 'ai/rsc';
-import { continueConversation } from '@/app/[chat]/actions';
+import { continueConversation, createConversationTitle } from '@/app/[chat]/actions';
 import { MessageInput } from '@/components/ui/message-input';
 import { MessageList } from "@/components/ui/message-list";
 import { ChatContainer, ChatMessages } from '@/components/ui/chat';
+import { mutate } from 'swr';
+import { authClient } from '@/lib/auth-client';
 
 // Assuming your Drizzle Message type is imported like this:
 // import type { Message } from '@/db/schema/chat-schema';
@@ -82,8 +84,26 @@ export default function ChatInterface({
 
   // Automatically trigger the assistant response if there's only the initial user message
   useEffect(() => {
-    if (conversation.length === 1 && conversation[0].role === 'user' && !autoTriggered.current) {
+    if (
+      conversation.length === 1 &&
+      conversation[0].role === 'user' &&
+      !autoTriggered.current
+    ) {
       autoTriggered.current = true;
+  
+      // Trigger the title creation in the background.
+      (async () => {
+        await createConversationTitle(chatId, conversation[0].content);
+        const { data: session, error } = await authClient.getSession()
+        console.log('User ID:', session?.user?.id ?? 'No user ID found')
+
+
+        
+        mutate(`/api/conversations?userId=${session?.user?.id}`);
+
+      })();
+  
+      // Continue with the assistant response generation as before.
       (async () => {
         setIsGenerating(true);
         try {
@@ -99,15 +119,15 @@ export default function ChatInterface({
             textContent += delta;
             setConversation([
               ...messages,
-              {  
+              {
                 conversationId: chatId,
-                role: 'assistant', 
+                role: 'assistant',
                 content: textContent,
                 position: messages.length + 1,
                 createdAt: new Date(),
                 tokensUsed: 0,
                 metadata: {},
-                updatedAt: new Date()
+                updatedAt: new Date(),
               },
             ]);
           }
@@ -117,6 +137,7 @@ export default function ChatInterface({
       })();
     }
   }, [conversation, providerId, modelId, systemPrompt, chatId]);
+  
 
   return (
     <ChatContainer className="h-full">
