@@ -1,6 +1,9 @@
-import { pgTable, uuid, varchar, text } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, pgEnum } from "drizzle-orm/pg-core";
 import { models } from "./models";
 import { providers } from "./providers";
+
+export const visibilityEnum = pgEnum("visibility", ["public", "private", "link"]);
+
 
 export const agents = pgTable("agents", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -10,6 +13,8 @@ export const agents = pgTable("agents", {
   description: text("description"),
   model: uuid("model").references(() => models.id),
   provider: uuid("provider").references(() => providers.id),
+  visibility: visibilityEnum("visibility").default("public"),
+
 });
 
 export type Agent = typeof agents.$inferSelect;
