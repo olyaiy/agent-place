@@ -21,7 +21,6 @@ export default async function Page({
         headers: await headers()
     })
     
-    // console.log("The user id is", session?.user?.id)
 
   // Destructure after awaiting params
   const { chat } = await params

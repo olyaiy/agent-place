@@ -267,7 +267,7 @@ const handleSend = async () => {
 
 
   return (
-    <ChatContainer className="h-full">
+    <ChatContainer className="h-full mt-4">
       <ChatMessages messages={conversation}>
         <div className="max-w-3xl mx-auto mt-auto">
           <MessageList 

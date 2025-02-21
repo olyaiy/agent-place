@@ -74,7 +74,7 @@ export default async function ChatPage({ params }: { params: Promise<{
     }));
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] max-h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-full">
       <div className="flex-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-screen-2xl items-center">
           <h1 className="text-lg font-semibold ml-14">{data.agent_display_name}</h1>
