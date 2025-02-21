@@ -15,6 +15,13 @@
       "when": 1740179466008,
       "tag": "0001_brief_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740180571992,
+      "tag": "0002_low_angel",
+      "breakpoints": true
     }
   ]
 }

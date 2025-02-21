@@ -1,4 +1,3 @@
-
 // app/agents/[agent]/page.tsx
 import { db } from "@/db/connection";
 import { agents } from "@/db/schema/agents";
@@ -43,14 +42,22 @@ export default async function AgentEditPage({
       .set({
         agent_display_name: name,
         system_prompt: formData.get("systemPrompt") as string,
-        model: formData.get("modelId") as string || null,
-        provider: formData.get("providerId") as string || null,
+        model: (formData.get("modelId") as string) || null,
+        provider: (formData.get("providerId") as string) || null,
         visibility: formData.get("visibility") as "public" | "private" | "link",
         agent: newAgentId,
       })
       .where(eq(agents.id, agent.id));
 
     redirect(`/agents/${newAgentId}`);
+  }
+
+  async function deleteAgent(formData: FormData) {
+    "use server";
+
+    // Delete the agent by its id and redirect to the agents list
+    await db.delete(agents).where(eq(agents.id, agent.id));
+    redirect("/agents");
   }
 
   return (
@@ -69,9 +76,9 @@ export default async function AgentEditPage({
         models={allModels}
         providers={allProviders}
         onSubmit={updateAgent}
+        onDelete={deleteAgent}
         submitLabel="Save Changes"
       />
     </>
   );
 }
-

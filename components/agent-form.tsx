@@ -1,3 +1,4 @@
+// agent-form.tsx
 "use client";
 import React, { useState } from "react";
 import {
@@ -23,6 +24,7 @@ interface AgentFormProps {
   providers: Array<{ id: string; provider: string; provider_display_name: string }>;
   onSubmit: (formData: FormData) => Promise<void>;
   submitLabel: string;
+  onDelete?: (formData: FormData) => Promise<void>;
 }
 
 export default function AgentForm({
@@ -31,12 +33,25 @@ export default function AgentForm({
   providers,
   onSubmit,
   submitLabel,
+  onDelete,
 }: AgentFormProps) {
   // Initialize with the passed visibility or default to "public"
   const [visibility, setVisibility] = useState(defaultValues.visibility || "public");
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="relative max-w-4xl mx-auto p-6 border rounded-md">
+      {/* Conditionally render delete button on top right if onDelete is provided */}
+      {onDelete && defaultValues.id && (
+        <form action={onDelete} className="absolute top-4 right-4">
+          <input type="hidden" name="id" value={defaultValues.id} />
+          <button
+            type="submit"
+            className="bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700 transition-colors"
+          >
+            Delete Agent
+          </button>
+        </form>
+      )}
       <form action={onSubmit} className="space-y-4">
         {defaultValues.id && (
           <input type="hidden" name="id" value={defaultValues.id} />
@@ -125,9 +140,7 @@ export default function AgentForm({
 
         {/* Visibility select */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">
-            Visibility
-          </label>
+          <label className="block text-sm font-medium">Visibility</label>
           <Select value={visibility} onValueChange={(val) => setVisibility(val)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select visibility" />

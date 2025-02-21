@@ -8,6 +8,9 @@ import { slugify } from "@/lib/utils";
 import { eq } from "drizzle-orm";
 import AgentForm from "@/components/agent-form";
 
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+
 export default async function NewAgentPage() {
   // Fetch available models and providers for select options
   const allModels = await db.select().from(models);
@@ -15,6 +18,15 @@ export default async function NewAgentPage() {
 
   async function createAgent(formData: FormData) {
     "use server";
+
+    // Get the current session using your auth system
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      throw new Error("User not authenticated");
+    }
 
     const name = formData.get("name") as string;
     const modelId = formData.get("modelId") as string;
@@ -38,6 +50,7 @@ export default async function NewAgentPage() {
       provider: provider?.id || null,
       visibility, // Save the visibility value
       agent: slugify(name),
+      creatorId: session.user.id, // Set the creator to the current user's id
     });
 
     redirect("/agents");
