@@ -14,30 +14,33 @@ export default async function NewAgentPage() {
 
   async function createAgent(formData: FormData) {
     "use server";
-    
+  
     const name = formData.get("name") as string;
     const modelId = formData.get("modelId") as string;
     const providerId = formData.get("providerId") as string;
-
+    const description = formData.get("description") as string; // Retrieve the description
+  
     // Get UUID references for model and provider
     const model = await db.query.models.findFirst({
       where: eq(models.model, modelId),
     });
-
+  
     const provider = await db.query.providers.findFirst({
       where: eq(providers.provider, providerId),
     });
-
+  
     await db.insert(agents).values({
       agent_display_name: name,
       system_prompt: formData.get("systemPrompt") as string,
+      description, // Insert the description
       model: model?.id || null,
       provider: provider?.id || null,
       agent: slugify(name)
     });
-
+  
     redirect("/agents");
   }
+  
 
   return (
     <div className="max-w-4xl mx-auto p-6">

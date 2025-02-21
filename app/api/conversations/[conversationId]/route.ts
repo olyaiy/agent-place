@@ -7,9 +7,9 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { conversationId: string } }
+  { params }: { params: Promise<{ conversationId: string }> }
 ) {
-  const { conversationId } = params;
+  const { conversationId } = await params;
 
   // Delete all messages associated with the conversation
   await db.delete(messages).where(eq(messages.conversationId, conversationId));
