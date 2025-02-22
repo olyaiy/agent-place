@@ -62,6 +62,7 @@ export function Sidebar() {
   if (!session) return null;
 
   return (
+    
     <div className="w-64 sta left-0 top-0 h-screen border-r p-4 overflow-scroll">
       <h2 className="text-lg font-semibold mb-4">Conversations</h2>
       <nav className="space-y-2">

@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { Sidebar } from "@/components/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "./app-sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +35,26 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full overflow-hidden">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased  h-full overflow-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased  h-full overflow-hidden w-full `}
       >
-        <SiteHeader session={sessionResponse?.session || null} />
-        <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
-          <Sidebar />
-          <main className="flex-1 p-4 h-full overflow-hidden w-full justify-center items-center">{children}</main>
+        <SidebarProvider>
+
+        
+        
+        <div className="flex  overflow-hidden bg-red-500 w-full">
+        <AppSidebar />
+
+        
+
+          {/* <Sidebar /> */}
+          <div className="w-full bg-green-500">
+          <SiteHeader session={sessionResponse?.session || null} />
+          <main className="flex-1 p-4 h-full overflow-hidden w-full justify-center items-center ">{children}</main>
+          </div>
+
         </div>
+      </SidebarProvider>
+
       </body>
     </html>
   );
